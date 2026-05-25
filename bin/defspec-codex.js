@@ -207,32 +207,64 @@ function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-function upsertTomlBlock(content, header, body) {
-  const escapedHeader = escapeRegExp(header);
-  const pattern = new RegExp(`\\n?\\[${escapedHeader}\\]\\n[\\s\\S]*?(?=\\n\\[[^\\n]+\\]|$)`, 'm');
-  const block = `[${header}]\n${body.trimEnd()}\n`;
-  if (pattern.test(content)) {
-    return content.replace(pattern, `\n${block}`);
-  }
-  return `${content.replace(/\s+$/, '')}\n\n${block}`;
+function normalizeTomlNewlines(content) {
+  return content.replace(/\r\n/g, '\n');
 }
 
+function removeTomlBlockContent(content, header) {
+  const target = `[${header}]`;
+  const lines = normalizeTomlNewlines(content).split('\n');
+  const kept = [];
+  let skipping = false;
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (/^\[[^\]]+\]$/.test(trimmed)) {
+      skipping = trimmed === target;
+      if (skipping) continue;
+    }
+    if (!skipping) kept.push(line);
+  }
+
+  return kept.join('\n').replace(/\n{3,}/g, '\n\n').trimEnd() + '\n';
+}
+
+function cleanupDefSpecConfigFragments(content) {
+  let next = normalizeTomlNewlines(content);
+  next = removeTomlBlockContent(next, `marketplaces.${CODEX_MARKETPLACE_NAME}`);
+  next = removeTomlBlockContent(next, `plugins."${CODEX_PLUGIN_NAME}@${CODEX_MARKETPLACE_NAME}"`);
+
+  const lines = next.split('\n');
+  const cleaned = [];
+  for (let index = 0; index < lines.length; index++) {
+    const current = lines[index];
+    const following = lines[index + 1] ?? '';
+    const isDefSpecSourcePair = /^source_type\s*=\s*"local"\s*$/.test(current)
+      && following === `source = ${quoteTomlString(homedir())}`;
+    if (isDefSpecSourcePair) {
+      index++;
+      continue;
+    }
+    cleaned.push(current);
+  }
+
+  return cleaned.join('\n').replace(/\n{3,}/g, '\n\n').trimEnd() + '\n';
+}
+
+function upsertTomlBlock(content, header, body) {
+  const block = `[${header}]\n${body.trimEnd()}\n`;
+  const withoutExisting = removeTomlBlockContent(cleanupDefSpecConfigFragments(content), header).trimEnd();
+  return `${withoutExisting}\n\n${block}`;
+}
 function quoteTomlString(value) {
   return `'${value.replace(/'/g, "''")}'`;
 }
 
 function installCodexConfig() {
-  const existing = existsSync(CODEX_CONFIG_PATH) ? readFileSync(CODEX_CONFIG_PATH, 'utf8') : '';
-  let next = upsertTomlBlock(
-    existing,
-    `marketplaces.${CODEX_MARKETPLACE_NAME}`,
-    `last_updated = "${new Date().toISOString()}"\nsource_type = "local"\nsource = ${quoteTomlString(homedir())}`,
-  );
-  next = upsertTomlBlock(
-    next,
-    `plugins."${CODEX_PLUGIN_NAME}@${CODEX_MARKETPLACE_NAME}"`,
-    'enabled = true',
-  );
+  const existing = cleanupDefSpecConfigFragments(existsSync(CODEX_CONFIG_PATH) ? readFileSync(CODEX_CONFIG_PATH, 'utf8') : '');
+  const marketplaceBlock = `[marketplaces.${CODEX_MARKETPLACE_NAME}]\nlast_updated = "${new Date().toISOString()}"\nsource_type = "local"\nsource = ${quoteTomlString(homedir())}\n`;
+  const pluginBlock = `[plugins."${CODEX_PLUGIN_NAME}@${CODEX_MARKETPLACE_NAME}"]\nenabled = true\n`;
+  const next = `${existing.trimEnd()}\n\n${marketplaceBlock}\n${pluginBlock}`;
   mkdirSync(dirname(CODEX_CONFIG_PATH), { recursive: true });
   writeFileSync(CODEX_CONFIG_PATH, next.trimEnd() + '\n', 'utf8');
   console.log(`  ✅ Codex config enabled -> ${CODEX_CONFIG_PATH}`);
@@ -397,9 +429,7 @@ function uninstallSkills() {
 }
 
 function removeTomlBlock(content, header) {
-  const escapedHeader = escapeRegExp(header);
-  const pattern = new RegExp(`\\n?\\[${escapedHeader}\\]\\n[\\s\\S]*?(?=\\n\\[[^\\n]+\\]|$)`, 'm');
-  return content.replace(pattern, '').trimEnd() + '\n';
+  return cleanupDefSpecConfigFragments(removeTomlBlockContent(content, header));
 }
 
 function uninstallPluginBundle() {
