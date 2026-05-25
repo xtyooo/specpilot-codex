@@ -1,13 +1,16 @@
 {
   "name": "defspec-codex",
-  "version": "0.1.0",
-  "description": "DefSpec requirement-driven development workflow for Codex with slash-discoverable skills.",
+  "version": "0.2.0",
+  "description": "DefSpec requirement-driven development workflow for Codex with slash-discoverable commands and skills.",
   "type": "module",
   "bin": {
     "defspec-codex": "bin/defspec-codex.js"
   },
   "files": [
     "bin/",
+    ".codex-plugin/",
+    "assets/",
+    "commands/",
     "skills/",
     "templates/",
     "README.md",

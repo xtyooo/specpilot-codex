@@ -19,10 +19,18 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
 const PKG = JSON.parse(readFileSync(resolve(ROOT, 'package.json'), 'utf8'));
 const SKILLS_SRC = resolve(ROOT, 'skills');
+const COMMANDS_SRC = resolve(ROOT, 'commands');
+const ASSETS_SRC = resolve(ROOT, 'assets');
+const PLUGIN_MANIFEST_SRC = resolve(ROOT, '.codex-plugin');
 const DOCS_SRC = resolve(ROOT, 'templates', 'docs', 'defspec');
 const AGENTS_SECTION_SRC = resolve(ROOT, 'templates', 'agents', 'AGENTS.section.md');
 const PROJECT_DIR = process.cwd();
 const CODEX_SKILLS_DIR = resolve(homedir(), '.agents', 'skills', 'defspec');
+const CODEX_PLUGIN_NAME = 'defspec';
+const CODEX_MARKETPLACE_NAME = 'defspec-local';
+const CODEX_PLUGIN_DIR = resolve(homedir(), 'plugins', CODEX_PLUGIN_NAME);
+const CODEX_MARKETPLACE_PATH = resolve(homedir(), '.agents', 'plugins', 'marketplace.json');
+const CODEX_CONFIG_PATH = resolve(homedir(), '.codex', 'config.toml');
 
 const SENTINEL_BEGIN = '<!-- defspec-codex:begin (do not edit between these markers) -->';
 const SENTINEL_END = '<!-- defspec-codex:end -->';
@@ -72,6 +80,13 @@ function sourceSkillNames() {
     .map((entry) => entry.name);
 }
 
+function sourceCommandNames() {
+  if (!existsSync(COMMANDS_SRC)) return [];
+  return readdirSync(COMMANDS_SRC, { withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith('.md') && !entry.name.startsWith('_'))
+    .map((entry) => entry.name.replace(/\.md$/, ''));
+}
+
 function isHomeDir(path) {
   try {
     return realpathSync(path).toLowerCase() === realpathSync(homedir()).toLowerCase();
@@ -85,8 +100,8 @@ function showHelp() {
 defspec-codex v${PKG.version}
 
 Usage:
-  npx defspec-codex                 Install Codex skills and initialize this project
-  npx defspec-codex --skills-only   Install/update global Codex skills only
+  npx defspec-codex                 Install Codex plugin/skills and initialize this project
+  npx defspec-codex --skills-only   Install/update global Codex integration only
   npx defspec-codex --init-only     Initialize current project only
   npx defspec-codex --check         Check current installation
   npx defspec-codex --uninstall     Remove current project DefSpec files
@@ -94,7 +109,7 @@ Usage:
   npx defspec-codex --yes           Overwrite existing template files
   npx defspec-codex --force         Allow project init in home directory
 
-After installing, restart Codex and type /defspec to discover DefSpec action skills.
+After installing, restart Codex and type /defspec to discover DefSpec commands.
 `);
 }
 
@@ -131,6 +146,103 @@ function installSkills() {
   console.log(`  ✅ Codex skills: ${countSkillDirs(CODEX_SKILLS_DIR)} installed -> ${CODEX_SKILLS_DIR}`);
 }
 
+function readJsonFile(path, fallback) {
+  if (!existsSync(path)) return fallback;
+  return JSON.parse(readFileSync(path, 'utf8'));
+}
+
+function writeJsonFile(path, payload) {
+  mkdirSync(dirname(path), { recursive: true });
+  writeFileSync(path, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
+}
+
+function installPluginBundle() {
+  if (!existsSync(PLUGIN_MANIFEST_SRC)) throw new Error(`Missing plugin manifest source: ${PLUGIN_MANIFEST_SRC}`);
+  if (!existsSync(COMMANDS_SRC)) throw new Error(`Missing commands source: ${COMMANDS_SRC}`);
+
+  rmSync(CODEX_PLUGIN_DIR, { recursive: true, force: true });
+  mkdirSync(CODEX_PLUGIN_DIR, { recursive: true });
+  copyDirSync(PLUGIN_MANIFEST_SRC, resolve(CODEX_PLUGIN_DIR, '.codex-plugin'));
+  copyDirSync(COMMANDS_SRC, resolve(CODEX_PLUGIN_DIR, 'commands'));
+  copyDirSync(SKILLS_SRC, resolve(CODEX_PLUGIN_DIR, 'skills'));
+  if (existsSync(ASSETS_SRC)) copyDirSync(ASSETS_SRC, resolve(CODEX_PLUGIN_DIR, 'assets'));
+  console.log(`  ✅ Codex plugin commands: ${sourceCommandNames().length} installed -> ${CODEX_PLUGIN_DIR}`);
+}
+
+function installMarketplace() {
+  const payload = readJsonFile(CODEX_MARKETPLACE_PATH, {
+    name: CODEX_MARKETPLACE_NAME,
+    interface: { displayName: 'DefSpec Local' },
+    plugins: [],
+  });
+
+  if (!payload.name) payload.name = CODEX_MARKETPLACE_NAME;
+  if (!payload.interface || typeof payload.interface !== 'object') payload.interface = { displayName: 'DefSpec Local' };
+  if (!Array.isArray(payload.plugins)) payload.plugins = [];
+
+  const entry = {
+    name: CODEX_PLUGIN_NAME,
+    source: {
+      source: 'local',
+      path: './plugins/defspec',
+    },
+    policy: {
+      installation: 'AVAILABLE',
+      authentication: 'ON_INSTALL',
+    },
+    category: 'Coding',
+  };
+
+  const index = payload.plugins.findIndex((plugin) => plugin && plugin.name === CODEX_PLUGIN_NAME);
+  if (index === -1) payload.plugins.push(entry);
+  else payload.plugins[index] = entry;
+
+  writeJsonFile(CODEX_MARKETPLACE_PATH, payload);
+  console.log(`  ✅ Codex marketplace -> ${CODEX_MARKETPLACE_PATH}`);
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function upsertTomlBlock(content, header, body) {
+  const escapedHeader = escapeRegExp(header);
+  const pattern = new RegExp(`\\n?\\[${escapedHeader}\\]\\n[\\s\\S]*?(?=\\n\\[[^\\n]+\\]|$)`, 'm');
+  const block = `[${header}]\n${body.trimEnd()}\n`;
+  if (pattern.test(content)) {
+    return content.replace(pattern, `\n${block}`);
+  }
+  return `${content.replace(/\s+$/, '')}\n\n${block}`;
+}
+
+function quoteTomlString(value) {
+  return `'${value.replace(/'/g, "''")}'`;
+}
+
+function installCodexConfig() {
+  const existing = existsSync(CODEX_CONFIG_PATH) ? readFileSync(CODEX_CONFIG_PATH, 'utf8') : '';
+  let next = upsertTomlBlock(
+    existing,
+    `marketplaces.${CODEX_MARKETPLACE_NAME}`,
+    `last_updated = "${new Date().toISOString()}"\nsource_type = "local"\nsource = ${quoteTomlString(homedir())}`,
+  );
+  next = upsertTomlBlock(
+    next,
+    `plugins."${CODEX_PLUGIN_NAME}@${CODEX_MARKETPLACE_NAME}"`,
+    'enabled = true',
+  );
+  mkdirSync(dirname(CODEX_CONFIG_PATH), { recursive: true });
+  writeFileSync(CODEX_CONFIG_PATH, next.trimEnd() + '\n', 'utf8');
+  console.log(`  ✅ Codex config enabled -> ${CODEX_CONFIG_PATH}`);
+}
+
+function installCodexIntegration() {
+  installSkills();
+  installPluginBundle();
+  installMarketplace();
+  installCodexConfig();
+}
+
 function initProject({ force, yes }) {
   if (!force && isHomeDir(PROJECT_DIR)) {
     throw new Error(`Refusing to initialize home directory: ${PROJECT_DIR}. Run from a project directory or pass --force.`);
@@ -159,13 +271,25 @@ function initProject({ force, yes }) {
 
 function checkInstall() {
   const names = sourceSkillNames();
+  const commands = sourceCommandNames();
   console.log(`\ndefspec-codex v${PKG.version} check\n`);
   console.log(`  Project: ${PROJECT_DIR}`);
   console.log(`  Global skill dir: ${CODEX_SKILLS_DIR}`);
+  console.log(`  Codex plugin dir: ${CODEX_PLUGIN_DIR}`);
   for (const name of names) {
     const ok = existsSync(resolve(CODEX_SKILLS_DIR, name, 'SKILL.md'));
     console.log(`  ${ok ? '✅' : '❌'} skill ${name}`);
   }
+  for (const name of commands) {
+    const ok = existsSync(resolve(CODEX_PLUGIN_DIR, 'commands', `${name}.md`));
+    console.log(`  ${ok ? '✅' : '❌'} command /defspec:${name}`);
+  }
+  const hasManifest = existsSync(resolve(CODEX_PLUGIN_DIR, '.codex-plugin', 'plugin.json'));
+  console.log(`  ${hasManifest ? '✅' : '❌'} plugin manifest`);
+  const hasMarketplace = existsSync(CODEX_MARKETPLACE_PATH) && readFileSync(CODEX_MARKETPLACE_PATH, 'utf8').includes('"name": "defspec"');
+  console.log(`  ${hasMarketplace ? '✅' : '❌'} marketplace entry`);
+  const hasConfig = existsSync(CODEX_CONFIG_PATH) && readFileSync(CODEX_CONFIG_PATH, 'utf8').includes(`[plugins."${CODEX_PLUGIN_NAME}@${CODEX_MARKETPLACE_NAME}"]`);
+  console.log(`  ${hasConfig ? '✅' : '❌'} Codex plugin enabled`);
   console.log(`  ${existsSync(resolve(PROJECT_DIR, 'docs', 'defspec', 'DEFSPEC.md')) ? '✅' : '❌'} docs/defspec`);
   const agentsPath = resolve(PROJECT_DIR, 'AGENTS.md');
   const hasAgents = existsSync(agentsPath) && readFileSync(agentsPath, 'utf8').includes(SENTINEL_BEGIN);
@@ -189,6 +313,44 @@ function uninstallSkills() {
     if (readdirSync(CODEX_SKILLS_DIR).length === 0) rmSync(CODEX_SKILLS_DIR, { recursive: true, force: true });
   } catch {}
   console.log(`  ✅ Removed ${removed} global DefSpec skills`);
+}
+
+function removeTomlBlock(content, header) {
+  const escapedHeader = escapeRegExp(header);
+  const pattern = new RegExp(`\\n?\\[${escapedHeader}\\]\\n[\\s\\S]*?(?=\\n\\[[^\\n]+\\]|$)`, 'm');
+  return content.replace(pattern, '').trimEnd() + '\n';
+}
+
+function uninstallPluginBundle() {
+  if (existsSync(CODEX_PLUGIN_DIR)) {
+    rmSync(CODEX_PLUGIN_DIR, { recursive: true, force: true });
+    console.log(`  ✅ Removed Codex plugin -> ${CODEX_PLUGIN_DIR}`);
+  }
+
+  if (existsSync(CODEX_MARKETPLACE_PATH)) {
+    const payload = readJsonFile(CODEX_MARKETPLACE_PATH, null);
+    if (payload && Array.isArray(payload.plugins)) {
+      const before = payload.plugins.length;
+      payload.plugins = payload.plugins.filter((plugin) => !plugin || plugin.name !== CODEX_PLUGIN_NAME);
+      if (payload.plugins.length !== before) {
+        writeJsonFile(CODEX_MARKETPLACE_PATH, payload);
+        console.log(`  ✅ Removed marketplace entry -> ${CODEX_MARKETPLACE_PATH}`);
+      }
+    }
+  }
+
+  if (existsSync(CODEX_CONFIG_PATH)) {
+    let next = readFileSync(CODEX_CONFIG_PATH, 'utf8');
+    next = removeTomlBlock(next, `plugins."${CODEX_PLUGIN_NAME}@${CODEX_MARKETPLACE_NAME}"`);
+    next = removeTomlBlock(next, `marketplaces.${CODEX_MARKETPLACE_NAME}`);
+    writeFileSync(CODEX_CONFIG_PATH, next, 'utf8');
+    console.log(`  ✅ Removed Codex config entries -> ${CODEX_CONFIG_PATH}`);
+  }
+}
+
+function uninstallCodexIntegration() {
+  uninstallSkills();
+  uninstallPluginBundle();
 }
 
 function uninstallProject() {
@@ -228,12 +390,12 @@ try {
     checkInstall();
   } else if (uninstall) {
     console.log(`\ndefspec-codex v${PKG.version} uninstall\n`);
-    if (!initOnly) uninstallSkills();
+    if (!initOnly) uninstallCodexIntegration();
     if (!skillsOnly) uninstallProject();
-    console.log('\n  Uninstall complete. Restart Codex if skills changed.\n');
+    console.log('\n  Uninstall complete. Restart Codex if integration changed.\n');
   } else {
     console.log(`\ndefspec-codex v${PKG.version}\n`);
-    if (!initOnly) installSkills();
+    if (!initOnly) installCodexIntegration();
     if (!skillsOnly) initProject({ force, yes });
     console.log('\n  Install complete. Restart Codex, then type /defspec in the composer.\n');
   }
@@ -241,4 +403,3 @@ try {
   console.error(`\n  ❌ ${error.message}\n`);
   process.exit(1);
 }
-

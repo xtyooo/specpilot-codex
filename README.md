@@ -2,7 +2,7 @@
 
 > 让 Codex 在写代码前先读定义、建需求、确认边界、出方案，再进入实现。
 
-`defspec-codex` 是一套面向 Codex 的 DefSpec 工作流安装器。它会安装一组可在 Codex `/` 面板中发现的 DefSpec skills，并在当前项目中初始化 `docs/defspec/` 需求文档体系。
+`defspec-codex` 是一套面向 Codex 的 DefSpec 工作流安装器。它会安装 Codex 本地插件命令、配套 skills，并在当前项目中初始化 `docs/defspec/` 需求文档体系。
 
 ---
 
@@ -44,27 +44,28 @@ Codex：先出技术方案，确认后再编码、测试、记录结果
 
 | 能力 | 说明 |
 |------|------|
-| `/defspec` 候选项 | 安装 8 个 Codex skills，输入 `/defspec` 可筛选动作 |
+| `/defspec:*` 命令 | 安装 8 个 Codex slash commands，输入 `/defspec` 可筛选动作 |
+| DefSpec skills | 安装 8 个配套 skills，确保 Codex 执行命令时遵循 DefSpec 工作流 |
 | 需求文档体系 | 初始化 `docs/defspec/requirements/`、`specs/`、项目指南模板 |
 | Codex 项目引导 | 向 `AGENTS.md` 写入 DefSpec bootstrap 段落 |
 | 可重复安装 | 使用哨兵注释更新 `AGENTS.md`，重复运行不会无限追加 |
-| 可检查 | `--check` 检查全局 skills 和当前项目初始化状态 |
+| 可检查 | `--check` 检查 commands、skills、插件启用状态和当前项目初始化状态 |
 | 可卸载 | `--uninstall` 清理安装的项目段落和模板 |
 
 ---
 
-## Skills 列表
+## 命令列表
 
-| Skill | 触发场景 |
+| Slash command | 触发场景 |
 |------|----------|
-| `DefSpec New` | 创建新需求草稿 |
-| `DefSpec List` | 查看需求列表和状态 |
-| `DefSpec Confirm` | 确认需求、业务规则、边界条件 |
-| `DefSpec Exec` | 设计方案并在确认后实施 |
-| `DefSpec Check` | 深度复核需求、方案、实现、测试和风险 |
-| `DefSpec Update` | 处理需求变更 |
-| `DefSpec Archive` | 归档已完成需求 |
-| `DefSpec Cancel` | 取消需求但保留记录 |
+| `/defspec:new` | 创建新需求草稿 |
+| `/defspec:list` | 查看需求列表和状态 |
+| `/defspec:confirm` | 确认需求、业务规则、边界条件 |
+| `/defspec:exec` | 设计方案并在确认后实施 |
+| `/defspec:check` | 深度复核需求、方案、实现、测试和风险 |
+| `/defspec:update` | 处理需求变更 |
+| `/defspec:archive` | 归档已完成需求 |
+| `/defspec:cancel` | 取消需求但保留记录 |
 
 ---
 
@@ -82,7 +83,15 @@ npx github:xtyooo/defspec-codex
 /defspec
 ```
 
-你应该能看到 `DefSpec New`、`DefSpec List`、`DefSpec Confirm`、`DefSpec Exec` 等候选项。
+你应该能看到 `/defspec:new`、`/defspec:list`、`/defspec:confirm`、`/defspec:exec`、`/defspec:check` 等候选项。
+
+如果没有出现，先确认已经完全退出并重新打开 Codex，再运行：
+
+```bash
+npx github:xtyooo/defspec-codex --check
+```
+
+检查结果里这些项应该是绿色：`plugin manifest`、`marketplace entry`、`Codex plugin enabled`、`command /defspec:*`。
 
 > 发布到 npm 后，也可以使用更短的命令：`npx defspec-codex`
 
@@ -90,19 +99,19 @@ npx github:xtyooo/defspec-codex
 
 ## 安装模式
 
-完整安装：安装全局 Codex skills，并初始化当前项目。
+完整安装：安装 Codex 本地插件命令、全局 skills，并初始化当前项目。
 
 ```bash
 npx github:xtyooo/defspec-codex
 ```
 
-只安装 `/defspec` skills，不改当前项目：
+只安装 `/defspec:*` 命令和 skills，不改当前项目：
 
 ```bash
 npx github:xtyooo/defspec-codex --skills-only
 ```
 
-只初始化当前项目，不改全局 skills：
+只初始化当前项目，不改全局 Codex 集成：
 
 ```bash
 npx github:xtyooo/defspec-codex --init-only
@@ -114,13 +123,13 @@ npx github:xtyooo/defspec-codex --init-only
 npx github:xtyooo/defspec-codex --check
 ```
 
-卸载当前项目 DefSpec 文件，并移除全局 skills：
+卸载当前项目 DefSpec 文件，并移除全局 Codex 集成：
 
 ```bash
 npx github:xtyooo/defspec-codex --uninstall
 ```
 
-只卸载全局 skills：
+只卸载全局 Codex 集成：
 
 ```bash
 npx github:xtyooo/defspec-codex --uninstall --skills-only
@@ -130,7 +139,24 @@ npx github:xtyooo/defspec-codex --uninstall --skills-only
 
 ## 安装内容
 
-全局 Codex skills：
+Codex 本地插件：
+
+```text
+~/plugins/defspec/
+├── .codex-plugin/plugin.json
+├── commands/
+├── skills/
+└── assets/
+```
+
+Codex marketplace 注册：
+
+```text
+~/.agents/plugins/marketplace.json
+~/.codex/config.toml
+```
+
+全局 DefSpec skills：
 
 ```text
 ~/.agents/skills/defspec/defspec-*
@@ -198,9 +224,7 @@ DefSpec Archive
 典型用法：
 
 ```text
-/defspec
-选择 DefSpec Check
-输入：检查 REQ-001
+/defspec:check REQ-001
 ```
 
 或直接说：
