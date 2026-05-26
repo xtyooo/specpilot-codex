@@ -1,9 +1,9 @@
 ---
-description: Record and handle a change to an existing DefSpec requirement.
+description: Record and handle a change to an existing SpecPilot requirement.
 argument-hint: REQ-xxx change summary
 ---
 
-# DefSpec Update
+# SpecPilot Update
 
 The user invoked this command with: $ARGUMENTS
 
@@ -39,4 +39,4 @@ Report what changed, what files were updated, and whether implementation is pend
 
 ## Next Steps
 
-Suggest `/defspec:check REQ-xxx` after the update.
+Suggest `/specpilot:check REQ-xxx` after the update.

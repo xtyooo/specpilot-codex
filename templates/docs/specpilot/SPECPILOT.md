@@ -1,6 +1,6 @@
-# DefSpec AI 指令
+# SpecPilot AI 指令
 
-> 当前项目使用 DefSpec 进行定义驱动开发。目标是让 Codex 在开发前先理解项目定义和需求定义，再做方案、实施和复核。
+> 当前项目使用 SpecPilot 进行规格领航开发。目标是让 Codex 在开发前先理解项目定义和需求定义，再做方案、实施和复核。
 
 ---
 
@@ -8,14 +8,14 @@
 
 每次处理非平凡需求时，先阅读：
 
-1. `docs/defspec/project.md`：人工维护的项目约定
-2. `docs/defspec/project-guide.md`：当前项目技术指南
-3. `docs/defspec/requirements/index.md`：需求索引
+1. `docs/specpilot/project.md`：人工维护的项目约定
+2. `docs/specpilot/project-guide.md`：当前项目技术指南
+3. `docs/specpilot/requirements/index.md`：需求索引
 4. 当前 `REQ-xxx` 的 draft/design/tasks 文件
 
 ---
 
-## 何时使用 DefSpec
+## 何时使用 SpecPilot
 
 需要使用：
 
@@ -23,7 +23,7 @@
 - 修改现有业务行为
 - 跨模块改动
 - 数据模型、接口、worker、定时任务、部署配置等有连锁影响的改动
-- 用户明确提到 `defspec`、`REQ-xxx`、需求、方案、规格
+- 用户明确提到 `SpecPilot`、`REQ-xxx`、需求、方案、规格
 
 可以跳过完整流程：
 
@@ -38,7 +38,7 @@
 
 ### 1. 新建需求
 
-当用户说要提新需求或使用 `/defspec:new`：
+当用户说要提新需求或使用 `/specpilot:new`：
 
 - 读取 `requirements/index.md` 获取下一个编号
 - 创建 `requirements/REQ-xxx-draft.md`
@@ -47,7 +47,7 @@
 
 ### 2. 需求确认
 
-当用户使用 `/defspec:confirm REQ-xxx`：
+当用户使用 `/specpilot:confirm REQ-xxx`：
 
 - 阅读草稿、项目指南和相关代码
 - 梳理术语、业务规则、调用链路、边界条件、测试用例
@@ -57,7 +57,7 @@
 
 ### 3. 方案设计
 
-当用户使用 `/defspec:exec REQ-xxx` 且执行模式为“先出方案”：
+当用户使用 `/specpilot:exec REQ-xxx` 且执行模式为“先出方案”：
 
 - 基于【需求确认】输出技术方案
 - 覆盖改动范围、数据流、关键实现、风险、测试策略
@@ -99,8 +99,8 @@
 ## 文档结构
 
 ```
-docs/defspec/
-├── DEFSPEC.md
+docs/specpilot/
+├── SPECPILOT.md
 ├── QUICKREF.md
 ├── README.md
 ├── project.md

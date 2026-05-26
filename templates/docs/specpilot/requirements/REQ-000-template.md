@@ -43,7 +43,7 @@
 
 ## 【需求确认】
 
-由 Codex 在 `/defspec:confirm REQ-xxx` 后填写。
+由 Codex 在 `/specpilot:confirm REQ-xxx` 后填写。
 
 ### 术语定义
 

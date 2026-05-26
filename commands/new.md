@@ -1,9 +1,9 @@
 ---
-description: Create the next DefSpec requirement draft and update the requirement index.
+description: Create the next SpecPilot requirement draft and update the requirement index.
 argument-hint: [requirement summary]
 ---
 
-# DefSpec New
+# SpecPilot New
 
 The user invoked this command with: $ARGUMENTS
 
@@ -11,16 +11,16 @@ Use this command to start a new requirement before implementation.
 
 ## Preflight
 
-1. Read `docs/defspec/DEFSPEC.md`, `docs/defspec/project.md`, and `docs/defspec/project-guide.md` if they exist.
-2. Read `docs/defspec/requirements/index.md` if it exists.
+1. Read `docs/specpilot/SPECPILOT.md`, `docs/specpilot/project.md`, and `docs/specpilot/project-guide.md` if they exist.
+2. Read `docs/specpilot/requirements/index.md` if it exists.
 3. Inspect the current repo enough to understand the requested capability.
-4. If DefSpec docs are missing, explain that the project should run `npx github:xtyooo/defspec-codex` first.
+4. If SpecPilot docs are missing, explain that the project should run `npx github:xtyooo/specpilot-codex` first.
 
 ## Plan
 
 1. Choose the next `REQ-xxx` id from the index or existing requirement files.
-2. Create a draft requirement record under `docs/defspec/requirements/`.
-3. Update `docs/defspec/requirements/index.md`.
+2. Create a draft requirement record under `docs/specpilot/requirements/`.
+3. Update `docs/specpilot/requirements/index.md`.
 4. Do not implement code in this command.
 
 ## Commands
@@ -42,4 +42,4 @@ Report the created requirement id, file path, status, and recommended next comma
 
 ## Next Steps
 
-Suggest `/defspec:confirm REQ-xxx` when the draft is ready to clarify.
+Suggest `/specpilot:confirm REQ-xxx` when the draft is ready to clarify.

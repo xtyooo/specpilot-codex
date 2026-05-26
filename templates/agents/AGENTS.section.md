@@ -1,27 +1,27 @@
-<!-- defspec-codex:begin (do not edit between these markers) -->
-## DefSpec
+<!-- specpilot-codex:begin (do not edit between these markers) -->
+## SpecPilot
 
-This project uses DefSpec for non-trivial feature work and behavior changes.
+This project uses SpecPilot for non-trivial feature work and behavior changes.
 
 Before starting requirement-driven work, read:
 
-1. `docs/defspec/DEFSPEC.md`
-2. `docs/defspec/project.md`
-3. `docs/defspec/project-guide.md`
-4. `docs/defspec/requirements/index.md`
+1. `docs/specpilot/SPECPILOT.md`
+2. `docs/specpilot/project.md`
+3. `docs/specpilot/project-guide.md`
+4. `docs/specpilot/requirements/index.md`
 
-The global commands installed by `defspec-codex` provide separate `/` entries:
+The global commands installed by `specpilot-codex` provide separate `/` entries:
 
-- `DefSpec New`
-- `DefSpec List`
-- `DefSpec Confirm`
-- `DefSpec Exec`
-- `DefSpec Check`
-- `DefSpec Update`
-- `DefSpec Archive`
-- `DefSpec Cancel`
+- `SpecPilot New`
+- `SpecPilot List`
+- `SpecPilot Confirm`
+- `SpecPilot Exec`
+- `SpecPilot Check`
+- `SpecPilot Update`
+- `SpecPilot Archive`
+- `SpecPilot Cancel`
 
-Use DefSpec for new capabilities, user-visible behavior changes, cross-module work, data/interface/worker changes, and requests mentioning `REQ-xxx` or DefSpec. Small bug fixes, typo changes, and tests for existing behavior may skip the full flow.
+Use SpecPilot for new capabilities, user-visible behavior changes, cross-module work, data/interface/worker changes, and requests mentioning `REQ-xxx` or SpecPilot. Small bug fixes, typo changes, and tests for existing behavior may skip the full flow.
 
 In `先出方案` mode, produce the design first and wait for explicit approval before coding.
-<!-- defspec-codex:end -->
+<!-- specpilot-codex:end -->

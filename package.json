@@ -1,10 +1,10 @@
 {
-  "name": "defspec-codex",
-  "version": "0.2.4",
-  "description": "DefSpec requirement-driven development workflow for Codex with slash-discoverable commands.",
+  "name": "specpilot-codex",
+  "version": "1.0.0",
+  "description": "SpecPilot requirement-driven development workflow for Codex with slash-discoverable commands.",
   "type": "module",
   "bin": {
-    "defspec-codex": "bin/defspec-codex.js"
+    "specpilot-codex": "bin/specpilot-codex.js"
   },
   "files": [
     "bin/",
@@ -17,19 +17,19 @@
   ],
   "keywords": [
     "codex",
-    "defspec",
+    "specpilot",
     "requirements",
     "spec-driven-development",
     "ai-coding"
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/xtyooo/defspec-codex.git"
+    "url": "git+https://github.com/xtyooo/specpilot-codex.git"
   },
   "bugs": {
-    "url": "https://github.com/xtyooo/defspec-codex/issues"
+    "url": "https://github.com/xtyooo/specpilot-codex/issues"
   },
-  "homepage": "https://github.com/xtyooo/defspec-codex#readme",
+  "homepage": "https://github.com/xtyooo/specpilot-codex#readme",
   "author": "",
   "license": "MIT",
   "engines": {

@@ -1,9 +1,9 @@
 ---
-description: Review a DefSpec requirement against design, implementation, tests, and risks.
+description: Review a SpecPilot requirement against design, implementation, tests, and risks.
 argument-hint: REQ-xxx
 ---
 
-# DefSpec Check
+# SpecPilot Check
 
 The user invoked this command with: $ARGUMENTS
 
@@ -11,7 +11,7 @@ Use this high-frequency command to audit whether a requirement and implementatio
 
 ## Preflight
 
-1. Read the required DefSpec context files.
+1. Read the required SpecPilot context files.
 2. Read the target requirement, design, task, and index records.
 3. Inspect relevant code, tests, and current git status.
 
@@ -40,4 +40,4 @@ Report findings first, then a short status assessment.
 
 ## Next Steps
 
-Suggest `/defspec:update REQ-xxx` for requirement changes, `/defspec:exec REQ-xxx` for fixes, or `/defspec:archive REQ-xxx` when complete.
+Suggest `/specpilot:update REQ-xxx` for requirement changes, `/specpilot:exec REQ-xxx` for fixes, or `/specpilot:archive REQ-xxx` when complete.

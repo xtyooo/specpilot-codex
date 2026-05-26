@@ -1,12 +1,12 @@
 # 项目技术指南
 
-> 本文件由 DefSpec 初始化器生成。首次在项目中使用 DefSpec 时，请让 Codex 根据当前仓库实际代码结构补全本指南。
+> 本文件由 SpecPilot 初始化器生成。首次在项目中使用 SpecPilot 时，请让 Codex 根据当前仓库实际代码结构补全本指南。
 
 ---
 
 ## 初始化指令
 
-请分析当前项目的代码结构、技术栈、开发规范、开发模式和测试方式，然后更新 `docs/defspec/project-guide.md`。
+请分析当前项目的代码结构、技术栈、开发规范、开发模式和测试方式，然后更新 `docs/specpilot/project-guide.md`。
 
 分析要求：
 

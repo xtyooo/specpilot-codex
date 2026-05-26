@@ -1,9 +1,9 @@
 ---
-description: Cancel a DefSpec requirement without deleting its history.
+description: Cancel a SpecPilot requirement without deleting its history.
 argument-hint: REQ-xxx
 ---
 
-# DefSpec Cancel
+# SpecPilot Cancel
 
 The user invoked this command with: $ARGUMENTS
 
@@ -39,4 +39,4 @@ Report the cancelled requirement id and any cleanup or replacement next steps.
 
 ## Next Steps
 
-Suggest `/defspec:new` if the cancelled work should be replaced by a new requirement.
+Suggest `/specpilot:new` if the cancelled work should be replaced by a new requirement.

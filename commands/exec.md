@@ -1,9 +1,9 @@
 ---
-description: Design and execute a confirmed DefSpec requirement with approval gates.
+description: Design and execute a confirmed SpecPilot requirement with approval gates.
 argument-hint: REQ-xxx
 ---
 
-# DefSpec Exec
+# SpecPilot Exec
 
 The user invoked this command with: $ARGUMENTS
 
@@ -11,7 +11,7 @@ Use this command to design and implement a confirmed requirement.
 
 ## Preflight
 
-1. Read the required DefSpec context files.
+1. Read the required SpecPilot context files.
 2. Read the target requirement and any existing design or task records.
 3. Inspect relevant code before proposing implementation.
 4. Check the working tree for unrelated changes and avoid reverting user work.
@@ -28,7 +28,7 @@ Use this command to design and implement a confirmed requirement.
 1. Implement the approved design using existing project patterns.
 2. Update requirement records with design, tasks, implementation notes, and test evidence where appropriate.
 3. Avoid unrelated refactors.
-4. Preserve generated-file and project-specific rules from `docs/defspec/project.md`, `docs/defspec/project-guide.md`, and `AGENTS.md` if it exists.
+4. Preserve generated-file and project-specific rules from `docs/specpilot/project.md`, `docs/specpilot/project-guide.md`, and `AGENTS.md` if it exists.
 
 ## Verification
 
@@ -42,4 +42,4 @@ Report implemented scope, changed areas, validation evidence, and residual risks
 
 ## Next Steps
 
-Suggest `/defspec:check REQ-xxx` before commit or `/defspec:archive REQ-xxx` after acceptance.
+Suggest `/specpilot:check REQ-xxx` before commit or `/specpilot:archive REQ-xxx` after acceptance.

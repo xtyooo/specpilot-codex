@@ -1,6 +1,6 @@
-# DefSpec
+# SpecPilot
 
-DefSpec 是本项目用于后续需求开发的定义驱动流程。它把“需求是什么”和“怎么实现”分开记录，让 Codex 在编码前拥有稳定上下文。
+SpecPilot 是本项目用于后续需求开发的规格领航流程。它把“需求是什么”和“怎么实现”分开记录，让 Codex 在编码前拥有稳定上下文。
 
 ## 核心目标
 
@@ -20,17 +20,17 @@ DefSpec 是本项目用于后续需求开发的定义驱动流程。它把“需
 
 ## 使用方式
 
-当前项目使用 `defspec-codex` 提供的全局 `/defspec:*` 命令。安装后，输入 `/defspec` 可以筛选出 8 个固定动作。也可以直接输入文本指令，例如：
+当前项目使用 `specpilot-codex` 提供的全局 `/specpilot:*` 命令。安装后，输入 `/specpilot` 可以筛选出 8 个固定动作。也可以直接输入文本指令，例如：
 
 ```text
-/defspec:new
-/defspec:confirm REQ-001
-/defspec:exec REQ-001
+/specpilot:new
+/specpilot:confirm REQ-001
+/specpilot:exec REQ-001
 方案确认，请开始实施
-/defspec:archive REQ-001
+/specpilot:archive REQ-001
 ```
 
-Codex 会根据 `DEFSPEC.md`、`project.md`、`project-guide.md` 和需求记录将这些指令作为项目内工作流处理。`AGENTS.md` 不是必需文件；如果项目已有该文件，可作为补充上下文。
+Codex 会根据 `SPECPILOT.md`、`project.md`、`project-guide.md` 和需求记录将这些指令作为项目内工作流处理。`AGENTS.md` 不是必需文件；如果项目已有该文件，可作为补充上下文。
 
 ## 文件约定
 

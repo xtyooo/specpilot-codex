@@ -1,9 +1,9 @@
 ---
-description: Archive a completed DefSpec requirement with implementation and validation notes.
+description: Archive a completed SpecPilot requirement with implementation and validation notes.
 argument-hint: REQ-xxx
 ---
 
-# DefSpec Archive
+# SpecPilot Archive
 
 The user invoked this command with: $ARGUMENTS
 
@@ -38,4 +38,4 @@ Report the archived requirement id, validation evidence, and any follow-up items
 
 ## Next Steps
 
-Suggest starting a new requirement with `/defspec:new` only if there is follow-up scope.
+Suggest starting a new requirement with `/specpilot:new` only if there is follow-up scope.

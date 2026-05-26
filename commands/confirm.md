@@ -1,9 +1,9 @@
 ---
-description: Confirm a DefSpec draft by clarifying scope, rules, boundaries, and tests.
+description: Confirm a SpecPilot draft by clarifying scope, rules, boundaries, and tests.
 argument-hint: REQ-xxx
 ---
 
-# DefSpec Confirm
+# SpecPilot Confirm
 
 The user invoked this command with: $ARGUMENTS
 
@@ -11,7 +11,7 @@ Use this command to turn a draft requirement into a confirmed requirement.
 
 ## Preflight
 
-1. Read the required DefSpec context files.
+1. Read the required SpecPilot context files.
 2. Read the target `REQ-xxx` draft and requirement index.
 3. Inspect relevant code paths enough to understand feasibility and integration boundaries.
 
@@ -41,4 +41,4 @@ Report what was confirmed, what remains risky, and the target requirement file.
 
 ## Next Steps
 
-Suggest `/defspec:exec REQ-xxx` to design and implement after confirmation.
+Suggest `/specpilot:exec REQ-xxx` to design and implement after confirmation.

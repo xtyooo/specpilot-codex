@@ -1,8 +1,8 @@
 ---
-description: List DefSpec requirements and summarize their current statuses.
+description: List SpecPilot requirements and summarize their current statuses.
 ---
 
-# DefSpec List
+# SpecPilot List
 
 The user invoked this command with: $ARGUMENTS
 
@@ -10,8 +10,8 @@ Use this command to show requirement status without changing files.
 
 ## Preflight
 
-1. Check whether `docs/defspec/requirements/index.md` exists.
-2. If it is missing, look for requirement files under `docs/defspec/requirements/`.
+1. Check whether `docs/specpilot/requirements/index.md` exists.
+2. If it is missing, look for requirement files under `docs/specpilot/requirements/`.
 
 ## Plan
 
@@ -36,4 +36,4 @@ Provide a compact status overview.
 
 ## Next Steps
 
-Suggest the most relevant follow-up command, such as `/defspec:check REQ-xxx` or `/defspec:confirm REQ-xxx`.
+Suggest the most relevant follow-up command, such as `/specpilot:check REQ-xxx` or `/specpilot:confirm REQ-xxx`.
